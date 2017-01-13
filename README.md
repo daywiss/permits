@@ -77,6 +77,7 @@ Permits takes 2 options, an array of permissions, and a callback function which 
 - upsert - A callback function which can take 2 parameters
   `function upsert(permission,path){}`
   - permission - A permissions object in the form 
+
     ```js
      { 
        userid:'userid',
@@ -86,6 +87,7 @@ Permits takes 2 options, an array of permissions, and a callback function which 
        type:'default' //optionally define a resource type, defaults to "default"
       }
     ```
+
    - path - the unique path to this permission object as an array. Use to create your own ID in the form:
      `[userid,type,resourceid,action]`
 
