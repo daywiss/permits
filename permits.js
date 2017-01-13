@@ -3,7 +3,7 @@ var assert = require('assert')
 
 module.exports = function(resume,handleChange){
   var methods = {}
-  var permissions = {}
+  var permissions = null
   var defaultType = 'default'
 
   function parseBoolean(bool){
@@ -43,7 +43,6 @@ module.exports = function(resume,handleChange){
     assert(userid,'requires userid')
     assert(resourceid,'requires resourceid')
     assert(action,'requires action')
-    console.log(permissions)
     return lodash.get(permissions,[userid,type,resourceid,action],null)
   }
 
@@ -135,12 +134,12 @@ module.exports = function(resume,handleChange){
 
   methods.init = function(r,u){
     handleChange = u
+    permissions = {}
     lodash.each(r,function(item){
       set(item.type,item.userid,item.resourceid,item.action,item.allowed)
     })
     return methods
   }
-
 
   return methods.init(resume,handleChange)
 }

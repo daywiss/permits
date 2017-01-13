@@ -92,34 +92,32 @@ Permits takes 2 options, an array of permissions, and a callback function which 
      `[userid,type,resourceid,action]`
 
 ##Set
-Multiple ways to set new permissions, they all trigger on change callback. Type is optional.
+Multiple ways to set new permissions, they all trigger on change callback. Type is optional, defaults to "default" if omitted.
 
-`var result = permits.set(userid,resourceid,action,allowed,type)`   
-`var result = permits.allow(userid,resourceid,action,type)`   
-`var result = permits.deny(userid,resourceid,action,type)`   
-`var result = permits.clear(userid,resourceid,action,type)`   
-
-
+`permits.set(userid,resourceid,action,allowed,type)`   
+`permits.allow(userid,resourceid,action,type)`   
+`permits.deny(userid,resourceid,action,type)`   
+`permits.clear(userid,resourceid,action,type)`   
 
 ##Get
-Gets full permissions object. Type is optional.
+Gets full permissions object. Type is optional, defaults to "default" if omitted.
 
 `permits.get(userid,resourceid,action,type)`
 
 ##Can
-Get a true, false or null answer for if a user can do something on a resource. Type is optional.
+Get a true, false or null answer for if a user can do something on a resource. Type is optional, defaults to "default" if omitted.
 
 `var result = permits.can(userid,resourceid,action,type)`
 
 ##Queries
 There are many helper queries to get lists of permissions. These iterate over the entire structure. 
-Type is optional in all queries.
+Type is optional in all queries, searches all types if omitted.
 
-`var result = permits.getByUser(userid,type)`   
-`var result = permits.getByResource(resourceid,type)`   
-`var result = permits.getByUserAndResource(userid,resourceid,type)`   
-`var result = permits.getByUserAndAction(userid,action,type)`   
-`var result = permits.getByResourceAndAction(resourceid,action,type)`   
+`permits.getByUser(userid,type)`   
+`permits.getByResource(resourceid,type)`   
+`permits.getByUserAndResource(userid,resourceid,type)`   
+`permits.getByUserAndAction(userid,action,type)`   
+`permits.getByResourceAndAction(resourceid,action,type)`   
    
 - returns - An array of permission objects, or an emtpy array if none are found.
 
@@ -129,11 +127,11 @@ optional, if none provided all permissions will be returned, which is the same a
  
 ```js
   var result = permits.filter({
-    userid:'userid',         //optional userid to match
-    resourceid:'resourceid', //optional resource id to match
-    action:'action',         //optional action to match
-    allowed:true,            //optional allowed to match, can be true or false
-    type:'type',             //optional type to match
+    userid:'userid',         //optional userid to match, searches all users if omitted.
+    resourceid:'resourceid', //optional resource id to match, searches all resources if omitted.
+    action:'action',         //optional action to match, searches all actions if omitted.
+    allowed:true,            //optional allowed to match, can be true or false. Searches all allowed states if omitted.
+    type:'type',             //optional type to match. Searches all types if omitted.
   })
 ```
 
