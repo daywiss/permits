@@ -94,10 +94,10 @@ Permits takes 2 options, an array of permissions, and a callback function which 
 ##Set
 Multiple ways to set new permissions, they all trigger on change callback. Type is optional.
 
-`var result = permits.set(userid,resourceid,action,allowed,type)`
-`var result = permits.allow(userid,resourceid,action,type)`
-`var result = permits.deny(userid,resourceid,action,type)`
-`var result = permits.clear(userid,resourceid,action,type)`
+`var result = permits.set(userid,resourceid,action,allowed,type)`   
+`var result = permits.allow(userid,resourceid,action,type)`   
+`var result = permits.deny(userid,resourceid,action,type)`   
+`var result = permits.clear(userid,resourceid,action,type)`   
 
 
 
@@ -115,17 +115,18 @@ Get a true, false or null answer for if a user can do something on a resource. T
 There are many helper queries to get lists of permissions. These iterate over the entire structure. 
 Type is optional in all queries.
 
-`var result = permits.getByUser(userid,type)`
-`var result = permits.getByResource(resourceid,type)`
-`var result = permits.getByUserAndResource(userid,resourceid,type)`
-`var result = permits.getByUserAndAction(userid,action,type)`
-`var result = permits.getByResourceAndAction(resourceid,action,type)`
-
+`var result = permits.getByUser(userid,type)`   
+`var result = permits.getByResource(resourceid,type)`   
+`var result = permits.getByUserAndResource(userid,resourceid,type)`   
+`var result = permits.getByUserAndAction(userid,action,type)`   
+`var result = permits.getByResourceAndAction(resourceid,action,type)`   
+   
 - returns - An array of permission objects, or an emtpy array if none are found.
 
 ##Filter
 If you need more search options you can filter directly on any permission parameter. All parameters
 optional, if none provided all permissions will be returned, which is the same as `permit.list()`
+ 
 ```js
   var result = permits.filter({
     userid:'userid',         //optional userid to match
@@ -135,6 +136,7 @@ optional, if none provided all permissions will be returned, which is the same a
     type:'type',             //optional type to match
   })
 ```
+
 ##List
 Get the entire permissions store as a list of permission objects.
 `var list = permits.list()`
