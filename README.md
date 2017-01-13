@@ -73,17 +73,17 @@ Permits takes 2 options, an array of permissions, and a callback function which 
 
 `Permits(resume,upsert)`
 
-- resume - An array of permission objects to restore previous state.
-- upsert - A callback function which can take 2 parameters
+- resume(optional, array) - An array of permission objects to restore previous state.
+- upsert(optional, function) - A callback function which can take 2 parameters
   `function upsert(permission,path){}`
-  - permission - A permissions object in the form 
+  - permission - A permissions object which was just updated, in the form 
 
     ```js
      { 
        userid:'userid',
        resourceid:'resourceid',
        action:'action'
-       allowed:true,
+       allowed:true,  //allowed can be true false or null
        type:'default' //optionally define a resource type, defaults to "default"
       }
     ```
