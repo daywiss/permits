@@ -1,0 +1,39 @@
+{
+  "name": "permits",
+  "version": "0.0.1",
+  "description": "Simple and flexible syncronous permission system on arbitrary resources with arbitrary users",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/daywiss/permits.git"
+  },
+  "keywords": [
+    "permissions",
+    "permission",
+    "resources",
+    "memory",
+    "syncronous",
+    "allow",
+    "deny",
+    "can",
+    "access",
+    "permit",
+    "permits",
+    "users"
+  ],
+  "author": "daywiss",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/daywiss/permits/issues"
+  },
+  "homepage": "https://github.com/daywiss/permits#readme",
+  "dependencies": {
+    "lodash": "^4.17.4"
+  },
+  "devDependencies": {
+    "tape": "^4.6.3"
+  }
+}
