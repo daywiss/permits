@@ -91,7 +91,7 @@ You may want to organize your resources by types and scope your permission metho
 
   //returns a permissions object
   //{
-  //  userid:'someuser',resourceid:'booktitle',action:'canRead',allowed:true
+  //  userid:'someuser',resourceid:'booktitle',action:'canRead',allowed:true, type:'books'
   //}
 
   //or user the default permission type

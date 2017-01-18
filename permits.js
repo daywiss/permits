@@ -103,29 +103,29 @@ function Type(type,root){
     return root.scope(t)
   }
 
-  methods.can = function(userid,resourceid,action){
-    return root.get(type,userid,resourceid,action)
+  methods.can = function(userid,resourceid,action,t){
+    return root.get(t || type,userid,resourceid,action)
   }
 
-  methods.get = function(userid,resourceid,action){
-    var allowed = root.get(type,userid,resourceid,action)
-    return root.makeObject(type,userid,resourceid,action,allowed)
+  methods.get = function(userid,resourceid,action,t){
+    var allowed = root.get(t || type,userid,resourceid,action)
+    return root.makeObject(t || type,userid,resourceid,action,allowed)
   }
 
-  methods.set = function(userid,resourceid,action,allowed){
-    return root.onChange(root.set(type,userid,resourceid,action,allowed))
+  methods.set = function(userid,resourceid,action,allowed,t){
+    return root.onChange(root.set(t || type,userid,resourceid,action,allowed))
   }
 
-  methods.allow = function(userid,resourceid,action){
-    return methods.set(userid,resourceid,action,true,type)
+  methods.allow = function(userid,resourceid,action,t){
+    return methods.set(userid,resourceid,action,true,t)
   }
 
-  methods.deny = function(userid,resourceid,action){
-    return methods.set(userid,resourceid,action,false,type)
+  methods.deny = function(userid,resourceid,action,t){
+    return methods.set(userid,resourceid,action,false,t)
   }
 
-  methods.clear = function(userid,resourceid,action){
-    return methods.set(userid,resourceid,action,null,type)
+  methods.clear = function(userid,resourceid,action,t){
+    return methods.set(userid,resourceid,action,null,t)
   }
 
   methods.filter = function(props){
@@ -133,36 +133,36 @@ function Type(type,root){
     return root.filter(props.type || type, props.userid,props.resourceid,props.action,props.allowed)
   }
 
-  methods.getByUser = function(userid){
+  methods.getByUser = function(userid,t){
     assert(userid,'requires userid')
-    return root.filter(type,userid)
+    return root.filter(t || type,userid)
   }
 
-  methods.getByResource = function(resourceid){
+  methods.getByResource = function(resourceid,t){
     assert(resourceid,'requires resourceid')
-    return root.filter(type,null,resourceid)
+    return root.filter(t || type,null,resourceid)
   }
 
-  methods.getByResourceAndAction = function(resourceid,action){
+  methods.getByResourceAndAction = function(resourceid,action,t){
     assert(resourceid,'requires resourceid')
     assert(action,'requires action')
-    return root.filter(type,null,resourceid,action,true)
+    return root.filter(t || type,null,resourceid,action,true)
   }
 
-  methods.getByUserAndAction = function(userid,action){
+  methods.getByUserAndAction = function(userid,action,t){
     assert(userid,'requires userid')
     assert(action,'requires action')
-    return root.filter(type,userid,null,action,true)
+    return root.filter(t || type,userid,null,action,true)
   }
 
-  methods.getByUserAndResource = function(userid,resourceid){
+  methods.getByUserAndResource = function(userid,resourceid,t){
     assert(userid,'requires userid')
     assert(resourceid,'requires resourceid')
-    return root.filter(type,userid,resourceid)
+    return root.filter(t || type,userid,resourceid)
   }
 
-  methods.list = function(){
-    return root.filter(type)
+  methods.list = function(t){
+    return root.filter(t || type)
   }
 
   methods.root = function(call){
