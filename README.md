@@ -198,7 +198,7 @@ to override the default type.
 `permits.getByUserAndAction(userid,action,type)`   
 `permits.getByResourceAndAction(resourceid,action,type)`   
    
-- returns - An array of permission objects, or an emtpy array if none are found.
+- returns - An array of permission objects, or an empty array if none are found.
 
 ##Filter
 If you need more search options you can filter directly on any permission parameter. All parameters
