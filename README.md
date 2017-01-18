@@ -8,10 +8,10 @@ Also has change event callbacks for syncronizing with persistent store.
 
 #Philosophy
 This library assumes that all things are identified by unique string ids. 
-It has 3 fundamental building blocks, the user, the resource and the action to be taken.
+There are 3 fundamental building blocks, the user, the resource and the action to be taken.
 This allows you to set and get which user can take what action on which resource.
-All data is stored in a nested object to reduce the total number of keys since there could be very many, 
-but the entire object can be filtered over to find any particular combination of entries. 
+All data is stored in a nested object to reduce the total number of keys on a single object since there could be very very many.
+The entire nested structure can be easily filtered over to find any particular combination of entries. 
 
 #Usage
 ```js
@@ -22,10 +22,7 @@ but the entire object can be filtered over to find any particular combination of
   //gives "userid" the ability to do "allowedAction" on "resourceid"
   var result = permissions.allow('userid','resourceid','allowedAction')
 
-  //can == true
-  var can = permission.can('userid','resourceid','allowedAction')
-
-  // result is in the form 
+  // result is a permissions object in the form 
   // { 
   //   userid:'userid',
   //   resourceid:'resourceid',
@@ -34,42 +31,110 @@ but the entire object can be filtered over to find any particular combination of
   //   type:'default' //optionally define a resource type, defaults to "default"
   //  }
 
+  //can == true
+  var can = permissions.can('userid','resourceid','allowedAction')
+
   //denys user ability to do deniedAction
   var result = permissions.deny('userid','resourceid','deniedAction')
 
   //can == false
-  var can = permission.can('userid','resourceid','deniedAction')
+  var can = permissions.can('userid','resourceid','deniedAction')
 
   //clear user ability to do neutralAction
   var result = permissions.clear('userid','resourceid','neutralAction')
 
   //can == null
-  var can = permission.can('userid','resourceid','neutralAction')
+  var can = permissions.can('userid','resourceid','neutralAction')
 ```
 
 #Restore and Persist
+Restore permissions from a persistent data store and syncronizes any changes back into the database.
 ```js
-  //assume we have a persisten store
+  //assume we have a persistent store
   var Store = require('permissionStore')
   var Permits = require('permits')
   
   function upsert(permission,path){
     //assume store has an upsert function which takes an object with an id property
     permissions.id = path.join('.')
-    store.upsert(permissions)
+    Store.upsert(permissions)
   }
 
   //assume store gets entire table as an array with getAll()
-  var permissions = Permits(store.getAll(),upsert)
+  var permissions = Permits(Store.getAll(),upsert)
 
  //any new permissions will be upserted into database
+ permissions.allow(...)
 
 ```
+
+#Resource Types
+You may want to organize your resources by types and scope your permission methods to those types.
+```js
+  var Permits = require('permits')
+
+  //your global permissions, this object works on the default permission type: 'default'
+  var permissions = Permits(resume,onChange)
+
+  //create permission types called books, which will still be accessible from the permissions object.
+  var books = permissions.type('books')
+
+  //these changes will trigger onChange callback on the permissions object
+  books.allow('someuser','booktitle','canRead')
+
+  //true
+  books.can('someuser','booktitle','canRead')
+
+  //access book types from the main permissions object. always will be consistent with
+  //other resource types, since they share the same object.
+  permissions.type('books').get('someuser','booktitle','canRead')
+
+  //returns a permissions object
+  //{
+  //  userid:'someuser',resourceid:'booktitle',action:'canRead',allowed:true
+  //}
+
+  //or user the default permission type
+  permissions.deny(/*etc...*/)
+  
+```
+#Permissions Object
+This is how the permissions object is returned and emitted through change callbacks.
+
+```js
+ { 
+   userid:'userid',
+   resourceid:'resourceid',
+   action:'action'
+   allowed:true,  //allowed can be true false or null
+   type:'default' //optionally define a resource type, defaults to "default"
+  }
+```
+
+Internally The permissions object resides in a nested object organized into this structure:
+```js
+  {
+    userid:{
+      type:{
+        resourceid:{
+          action:true //true false or undefined
+        }
+      }
+    }
+  }
+```
+It is accessed through lodash .get and .set methods. It will also be returned as a path on change:
+
+```
+  path = [userid,type,resourceid,action]
+
+```
+You can use this to create a unique id for insertion into a traditional database. 
 
 #API
 
 ##Initialize
-Permits takes 2 options, an array of permissions, and a callback function which gets executed every time permissions change.
+Permits takes 3 options, an array of permissions, a callback function which gets executed every time permissions change and a string to define the default permissions type.
 
 `Permits(resume,upsert)`
 
@@ -90,40 +155,52 @@ Permits takes 2 options, an array of permissions, and a callback function which 
 
    - path - the unique path to this permission object as an array. Use to create your own ID in the form:
      `[userid,type,resourceid,action]`
+- defaultType(optional, string) - defaults to the string 'default'. Set to whatever your default permissions resource type should be.
+
+##Type
+Creating a resource type is optional, by default just initialize the permits class and it is ready to be used.
+If you need the ability to define seperate resources then use this function. All functions on the returned object
+will be scoped to whatever resource type you define.  It has the same API as the permits object.
+
+```
+  var books = permits.type('books')
+  //use books like a permits object, it has all the same functions
+```
 
 ##Set
-Multiple ways to set new permissions, they all trigger on change callback. Type is optional, defaults to "default" if omitted.
+Multiple ways to set new permissions, they all trigger on change callback. 
 
-`permits.set(userid,resourceid,action,allowed,type)`   
-`permits.allow(userid,resourceid,action,type)`   
-`permits.deny(userid,resourceid,action,type)`   
-`permits.clear(userid,resourceid,action,type)`   
+`permits.set(userid,resourceid,action,allowed)`   
+`permits.allow(userid,resourceid,action)`   
+`permits.deny(userid,resourceid,action)`   
+`permits.clear(userid,resourceid,action)`   
 
 ##Get
-Gets full permissions object. Type is optional, defaults to "default" if omitted.
+Gets full permissions object. 
 
-`permits.get(userid,resourceid,action,type)`
+`permits.get(userid,resourceid,action)`
 
 ##Can
-Get a true, false or null answer for if a user can do something on a resource. Type is optional, defaults to "default" if omitted.
+Get a true, false or null answer for if a user can do something on a resource. 
 
-`var result = permits.can(userid,resourceid,action,type)`
+`var result = permits.can(userid,resourceid,action)`
 
 ##Queries
-There are many helper queries to get lists of permissions. These iterate over the entire structure. 
-Type is optional in all queries, searches all types if omitted.
+There are many helper queries to get lists of permissions. These iterate over the entire structure, scoped to the resource type.
 
-`permits.getByUser(userid,type)`   
-`permits.getByResource(resourceid,type)`   
-`permits.getByUserAndResource(userid,resourceid,type)`   
-`permits.getByUserAndAction(userid,action,type)`   
-`permits.getByResourceAndAction(resourceid,action,type)`   
+`permits.getByUser(userid)`   
+`permits.getByResource(resourceid)`   
+`permits.getByUserAndResource(userid,resourceid)`   
+`permits.getByUserAndAction(userid,action)`   
+`permits.getByResourceAndAction(resourceid,action)`   
    
 - returns - An array of permission objects, or an emtpy array if none are found.
 
 ##Filter
 If you need more search options you can filter directly on any permission parameter. All parameters
-optional, if none provided all permissions will be returned, which is the same as `permit.list()`
+optional, if none provided all permissions will be returned, which is the same as `permit.list()`.
+One caveat is that if you are filtering from a typed permissions, then it will only filter over that type.
+Use the root permits object to search over all types.
  
 ```js
   var result = permits.filter({
@@ -131,11 +208,12 @@ optional, if none provided all permissions will be returned, which is the same a
     resourceid:'resourceid', //optional resource id to match, searches all resources if omitted.
     action:'action',         //optional action to match, searches all actions if omitted.
     allowed:true,            //optional allowed to match, can be true or false. Searches all allowed states if omitted.
-    type:'type',             //optional type to match. Searches all types if omitted.
+    type:'type',             //optional type to match. Searches all default type if omitted.
   })
 ```
 
 ##List
-Get the entire permissions store as a list of permission objects.
+Get the entire permissions store as a list of permission objects. If using a typed permission, then it will only return 
+the entirety of that type. Use the root permits object to get entire list.
 `var list = permits.list()`
 

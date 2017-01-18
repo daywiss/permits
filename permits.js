@@ -1,10 +1,12 @@
 var lodash = require('lodash')
 var assert = require('assert')
 
-module.exports = function(resume,handleChange){
+module.exports = Permits
+
+function Permits(resume,handleChange, defaultType){
   var methods = {}
   var permissions = null
-  var defaultType = 'default'
+  var defaultType = defaultType || 'default'
 
   function parseBoolean(bool){
     if(bool === true) return bool
@@ -70,76 +72,109 @@ module.exports = function(resume,handleChange){
     },[])
   }
 
-  methods.can = function(userid,resourceid,action,type){
-    return get(type,userid,resourceid,action)
+  function init(){
+    permissions = {}
+    lodash.each(resume,function(item){
+      set(item.type,item.userid,item.resourceid,item.action,item.allowed)
+    })
+    return Type(null,methods)
   }
 
-  methods.get = function(userid,resourceid,action,type){
-    var allowed = get(type,userid,resourceid,action)
-    return makeObject(type,userid,resourceid,action,allowed)
+  function scope(type){
+    assert(type,'requires resource type')
+    return Type(type,methods)
+  }
+  
+  methods.set = set
+  methods.get = get
+  methods.filter = filter
+  methods.scope = scope
+  methods.init = init
+  methods.onChange = onChange
+  methods.makeObject = makeObject
+
+  return init()
+}
+
+function Type(type,root){
+  var methods = {}
+
+  methods.type = function(t){
+    return root.scope(t)
   }
 
-  methods.set = function(userid,resourceid,action,allowed,type){
-    return onChange(set(type,userid,resourceid,action,allowed))
+  methods.can = function(userid,resourceid,action){
+    return root.get(type,userid,resourceid,action)
   }
 
-  methods.allow = function(userid,resourceid,action,type){
+  methods.get = function(userid,resourceid,action){
+    var allowed = root.get(type,userid,resourceid,action)
+    return root.makeObject(type,userid,resourceid,action,allowed)
+  }
+
+  methods.set = function(userid,resourceid,action,allowed){
+    return root.onChange(root.set(type,userid,resourceid,action,allowed))
+  }
+
+  methods.allow = function(userid,resourceid,action){
     return methods.set(userid,resourceid,action,true,type)
   }
 
-  methods.deny = function(userid,resourceid,action,type){
+  methods.deny = function(userid,resourceid,action){
     return methods.set(userid,resourceid,action,false,type)
   }
 
-  methods.clear = function(userid,resourceid,action,type){
+  methods.clear = function(userid,resourceid,action){
     return methods.set(userid,resourceid,action,null,type)
   }
 
   methods.filter = function(props){
     assert(props,'requires an object with optional properties, userid, resourceid, action, allowed, type')
-    return filter(props.type,props.userid,props.resourceid,props.action,props.allowed)
+    return root.filter(props.type || type, props.userid,props.resourceid,props.action,props.allowed)
   }
 
-  methods.getByUser = function(userid,type){
+  methods.getByUser = function(userid){
     assert(userid,'requires userid')
-    return filter(type,userid)
+    return root.filter(type,userid)
   }
 
-  methods.getByResource = function(resourceid,type){
+  methods.getByResource = function(resourceid){
     assert(resourceid,'requires resourceid')
-    return filter(type,null,resourceid)
+    return root.filter(type,null,resourceid)
   }
 
-  methods.getByResourceAndAction = function(resourceid,action,type){
+  methods.getByResourceAndAction = function(resourceid,action){
     assert(resourceid,'requires resourceid')
     assert(action,'requires action')
-    return filter(type,null,resourceid,action,true)
+    return root.filter(type,null,resourceid,action,true)
   }
 
-  methods.getByUserAndAction = function(userid,action,type){
+  methods.getByUserAndAction = function(userid,action){
     assert(userid,'requires userid')
     assert(action,'requires action')
-    return filter(type,userid,null,action,true)
+    return root.filter(type,userid,null,action,true)
   }
 
-  methods.getByUserAndResource = function(userid,resourceid,type){
+  methods.getByUserAndResource = function(userid,resourceid){
     assert(userid,'requires userid')
     assert(resourceid,'requires resourceid')
-    return filter(type,userid,resourceid)
+    return root.filter(type,userid,resourceid)
   }
 
   methods.list = function(){
-    return filter()
+    return root.filter(type)
   }
 
-  methods.init = function(r,u){
-    handleChange = u
-    permissions = {}
-    lodash.each(r,function(item){
-      set(item.type,item.userid,item.resourceid,item.action,item.allowed)
-    })
-    return methods
+  methods.root = function(call){
+    assert(call,'requires object with a method property to call')
+    assert(call,method,'requires method to call')
+    try{
+      return root[call.method](call.type,call.userid,call.resourceid,call.action,call.allowed)
+    }catch(e){
+      throw new Error('call failed: ' + e.message)
+    }
   }
 
-  return methods.init(resume,handleChange)
+  return methods
 }
+

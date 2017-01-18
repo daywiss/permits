@@ -4,6 +4,7 @@ var lodash = require('lodash')
 
 function run(t,Permits){
   var permits = null
+  var type = null
   var resume = lodash.times(3,function(i){
     return {
       userid:'user'+i,
@@ -16,7 +17,8 @@ function run(t,Permits){
 
   t.test('permits',function(t){
     t.test('init',function(t){
-      permits = Permits(resume,console.log.bind(console))
+      permits = Permits(resume,console.log.bind(console),'test')
+      type = permits.type('test')
       t.ok(permits)
       t.end()
     })
@@ -26,12 +28,12 @@ function run(t,Permits){
       t.end()
     })
     t.test('can',function(t){
-      var result = permits.can('user1','resource1','action1','test')
+      var result = permits.can('user1','resource1','action1')
       t.ok(result)
       t.end()
     })
     t.test('get',function(t){
-      var result = permits.get('user2','resource2','action2','test')
+      var result = permits.get('user2','resource2','action2')
       t.equal(result.userid,'user2')
       t.ok(result.allowed)
       t.end()

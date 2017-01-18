@@ -1,6 +1,6 @@
 {
   "name": "permits",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "description": "Simple and flexible syncronous permission system on arbitrary resources with arbitrary users",
   "main": "index.js",
   "scripts": {
@@ -20,8 +20,16 @@
     "deny",
     "can",
     "access",
+    "control",
+    "access control",
+    "acl",
+    "authorization",
+    "auth",
+    "role",
+    "roles",
     "permit",
     "permits",
+    "groups",
     "users"
   ],
   "author": "daywiss",
