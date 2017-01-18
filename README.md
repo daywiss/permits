@@ -219,5 +219,6 @@ Use the root permits object to search over all types.
 ##List
 Get the entire permissions store as a list of permission objects. If using a typed permission, then it will only return 
 the entirety of that type. Use the root permits object to get entire list. Type is optional.
+
 `var list = permits.list(type)`
 
