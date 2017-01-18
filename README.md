@@ -88,13 +88,15 @@ You may want to organize your resources by types and scope your permission metho
   //access book types from the main permissions object. always will be consistent with
   //other resource types, since they share the same object.
   permissions.type('books').get('someuser','booktitle','canRead')
+  //this does the exact same thing
+  permissions.get('someuser','booktitle','canRead','books')
 
   //returns a permissions object
   //{
   //  userid:'someuser',resourceid:'booktitle',action:'canRead',allowed:true, type:'books'
   //}
 
-  //or user the default permission type
+  //or use the default permission type
   permissions.deny(/*etc...*/)
   
 ```
@@ -168,31 +170,33 @@ will be scoped to whatever resource type you define.  It has the same API as the
 ```
 
 ##Set
-Multiple ways to set new permissions, they all trigger on change callback. 
+Multiple ways to set new permissions, they all trigger on change callback. Type is optional and defaults to
+the either the default type, or the custom type.
 
-`permits.set(userid,resourceid,action,allowed)`   
-`permits.allow(userid,resourceid,action)`   
-`permits.deny(userid,resourceid,action)`   
-`permits.clear(userid,resourceid,action)`   
+`permits.set(userid,resourceid,action,allowed,type)`   
+`permits.allow(userid,resourceid,action,type)`   
+`permits.deny(userid,resourceid,action,type)`   
+`permits.clear(userid,resourceid,action,type)`   
 
 ##Get
-Gets full permissions object. 
+Gets full permissions object. Type is optional to override the default type.
 
-`permits.get(userid,resourceid,action)`
+`permits.get(userid,resourceid,action,type)`
 
 ##Can
-Get a true, false or null answer for if a user can do something on a resource. 
+Get a true, false or null answer for if a user can do something on a resource.  Type is optional to override default type.
 
-`var result = permits.can(userid,resourceid,action)`
+`var result = permits.can(userid,resourceid,action,type)`
 
 ##Queries
-There are many helper queries to get lists of permissions. These iterate over the entire structure, scoped to the resource type.
+There are many helper queries to get lists of permissions. These iterate over the entire structure, scoped to the resource type. Type is optional
+to override the default type.
 
-`permits.getByUser(userid)`   
-`permits.getByResource(resourceid)`   
-`permits.getByUserAndResource(userid,resourceid)`   
-`permits.getByUserAndAction(userid,action)`   
-`permits.getByResourceAndAction(resourceid,action)`   
+`permits.getByUser(userid,type)`   
+`permits.getByResource(resourceid,type)`   
+`permits.getByUserAndResource(userid,resourceid,type)`   
+`permits.getByUserAndAction(userid,action,type)`   
+`permits.getByResourceAndAction(resourceid,action,type)`   
    
 - returns - An array of permission objects, or an emtpy array if none are found.
 
@@ -214,6 +218,6 @@ Use the root permits object to search over all types.
 
 ##List
 Get the entire permissions store as a list of permission objects. If using a typed permission, then it will only return 
-the entirety of that type. Use the root permits object to get entire list.
-`var list = permits.list()`
+the entirety of that type. Use the root permits object to get entire list. Type is optional.
+`var list = permits.list(type)`
 
