@@ -138,7 +138,7 @@ You can use this to create a unique id for insertion into a traditional database
 ##Initialize
 Permits takes 3 options, an array of permissions, a callback function which gets executed every time permissions change and a string to define the default permissions type.
 
-`Permits(resume,upsert)`
+`Permits(resume,upsert,defaultType)`
 
 - resume(optional, array) - An array of permission objects to restore previous state.
 - upsert(optional, function) - A callback function which can take 2 parameters
