@@ -68,7 +68,7 @@ Restore permissions from a persistent data store and syncronizes any changes bac
 
 ```
 
-#Resource Types
+# Resource Types
 You may want to organize your resources by types and scope your permission methods to those types.
 ```js
   var Permits = require('permits')
