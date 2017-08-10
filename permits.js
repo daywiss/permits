@@ -6,6 +6,8 @@ module.exports = Permits
 function Permits(resume,handleChange, defaultType){
   var methods = {}
   var permissions = null
+  //for faster filtering
+  var permissionByResource = null
   var defaultType = defaultType || 'default'
 
   function parseBoolean(bool){
@@ -37,6 +39,8 @@ function Permits(resume,handleChange, defaultType){
     assert(resourceid,'requires resourceid')
     assert(action,'requires action')
     lodash.set(permissions,[userid,type,resourceid,action],parseBoolean(allowed))
+    //secondary table for filtering by resourceid
+    lodash.set(permissionsByResource,[resourceid,type,userid,action],parseBoolean(allowed))
     return makeObject(type,userid,resourceid,action,allowed)
   }
 
@@ -54,10 +58,30 @@ function Permits(resume,handleChange, defaultType){
     }
   }
 
-  function filter(tid,uid,rid,aid,allowid){
-    return lodash.reduce(permissions,function(result,users,userid){
+  function filterByResource(tid,uid,rid,aid,allowid){
+    console.log('filter by resource')
+    return lodash.reduce(permissionsByResource,function(result,types,resourceid){
+      if(rid && resourceid != rid) return result
+      lodash.each(types,function(users,type){
+        if(tid && type != tid) return 
+        lodash.each(users,function(actions,userid){
+          if(uid && userid != uid) return
+          lodash.each(actions,function(allowed,action){
+            if(aid && action != aid) return
+            if(lodash.isBoolean(allowid) && allowed != allowid) return
+            result.push(makeObject(type,userid,resourceid,action,allowed))
+          })
+        })
+      })
+      return result
+    },[])
+  }
+
+  function filterByUser(tid,uid,rid,aid,allowid){
+    console.log('filter by user')
+    return lodash.reduce(permissions,function(result,types,userid){
       if(uid && userid != uid) return result
-      lodash.each(users,function(resources,type){
+      lodash.each(types,function(resources,type){
         if(tid && type != tid) return 
         lodash.each(resources,function(actions,resourceid){
           if(rid && resourceid != rid) return
@@ -72,8 +96,16 @@ function Permits(resume,handleChange, defaultType){
     },[])
   }
 
+  function filter(tid,uid,rid,aid,allowid){
+    //special case where we need to iterate all users but only 1 resource
+    //this matters when table gets to millions of entries
+    if(uid == null && rid) return filterByResource(tid,uid,rid,aid,allowid)
+    return filterByUser(tid,uid,rid,aid,allowid)
+  }
+
   function init(){
     permissions = {}
+    permissionsByResource = {}
     lodash.each(resume,function(item){
       set(item.type,item.userid,item.resourceid,item.action,item.allowed)
     })

@@ -83,6 +83,12 @@ function run(t,Permits){
       t.equal(result.length,1)
       t.end()
     })
+    t.test('filter with resourceid',function(t){
+      var result = permits.filter({resourceid:'resource1'})
+      t.equal(result.length,1)
+      t.equal(result[0].userid,'user1')
+      t.end()
+    })
   })
 }
 
