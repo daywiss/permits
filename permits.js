@@ -59,7 +59,6 @@ function Permits(resume,handleChange, defaultType){
   }
 
   function filterByResource(tid,uid,rid,aid,allowid){
-    console.log('filter by resource')
     return lodash.reduce(permissionsByResource,function(result,types,resourceid){
       if(rid && resourceid != rid) return result
       lodash.each(types,function(users,type){
@@ -78,7 +77,6 @@ function Permits(resume,handleChange, defaultType){
   }
 
   function filterByUser(tid,uid,rid,aid,allowid){
-    console.log('filter by user')
     return lodash.reduce(permissions,function(result,types,userid){
       if(uid && userid != uid) return result
       lodash.each(types,function(resources,type){
