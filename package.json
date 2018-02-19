@@ -1,6 +1,6 @@
 {
   "name": "permits",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Simple and flexible syncronous permission system on arbitrary resources with arbitrary users",
   "main": "index.js",
   "scripts": {
